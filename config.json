@@ -1,0 +1,4 @@
+{
+    "db": "mongodb://localhost:27017/gym-db",
+    "version": "/api/v1"
+}
