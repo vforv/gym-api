@@ -14,3 +14,8 @@ var userSchema = {
     deletedDate: {type: Date},
     isDeleted: {type: Boolean, default: false},
 }
+
+var schema = new mongoose.Schema(userSchema);
+
+
+module.exports = schema;
