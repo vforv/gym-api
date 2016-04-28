@@ -1,4 +1,4 @@
-var logic = require('./logic');
+var logic = require('./logic/user');
 var express = require('express');
 var bodyParser = require('body-parser');
 
@@ -16,9 +16,17 @@ module.exports = function (wagner)
     var api = express.Router();
     api.use(bodyParser.json());
     
-    api.get('/me', wagner.invoke(function(User) {
-        return logic(User).me
+    //User routes
+
+    api.post('/register', wagner.invoke(function(User){
+    	return logic(User).register;
     }));
+
+    api.post('/login', wagner.invoke(function(User) {
+        return logic(User).login;
+    }));
+
+    
     
     return api;
 }

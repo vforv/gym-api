@@ -1,9 +1,11 @@
 var mongoose = require('mongoose');
+var crypto = require('crypto');
+var _ = require('underscore');
 
 var userSchema = {
     name: {type: String, required: false},
     picture: {type: String, required: false},
-    email: {type: String, required: true, index: {unique: true}},
+    email: {type: String, required: true, index: { unique: true }},
     password: {type: String, required: false},
     salt: {type: String, required: false},
     createDate: {type: Date, default: Date.now},
@@ -16,6 +18,30 @@ var userSchema = {
 }
 
 var schema = new mongoose.Schema(userSchema);
+
+ schema.pre('save', function(next){
+    var self = this;
+     self.updateDate = Date.now;
+    next();
+ });
+
+
+schema.virtual('hash').set(function (password) {
+    this.salt = new Buffer(32).toString('base64');
+
+    var hash = crypto.pbkdf2Sync(password, this.salt, 1000, 32).toString('hex');
+    this.password = hash;
+});
+
+schema.methods.toPublicJSON = function() {
+    var json = this.toJSON();
+    return _.pick(json, 'name', 'email', '_id', 'updateDate', 'createDate', 'picture');
+};
+
+schema.methods.validatePassword = function(password){
+    var hash = crypto.pbkdf2Sync(password, this.salt, app.config.bcrypt.iterations, app.config.bcrypt.bytes).toString('hex');
+    return this.password === hash;
+};
 
 
 module.exports = schema;
