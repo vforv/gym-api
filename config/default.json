@@ -1,0 +1,15 @@
+{
+    "db": "mongodb://localhost:27017/gym-db",
+    "version": "/api/v1",
+    "bcrypt":{
+        "saltWorkFactor":10,
+        "iterations":1000,
+        "bytes":32
+    },
+    "jwt":{
+        "secret":"PL8PffjVRLTncTcfSpwWLj5b3pU6iutrPcALyscwE8LnV7aSj9Tvrt2wgVroVVGE2cG2WQlDCGzmZlwDZzfMyGBWf9tw6LRrUUefUBQ363XxpAvQ8GbnC0aVG9FR8wAJ",
+        "key": "dsasdasreraewrfiaebflaehidasd",
+        "type": "Bearer",
+        "validDays": 365
+    }
+}

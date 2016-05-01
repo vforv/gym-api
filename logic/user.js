@@ -6,7 +6,25 @@ function userWrapper(User) {
 
     var user = {
         login: function (req, res) {
-            res.send("TEST");
+            var body = _.pick(req.body, 'email', 'password');
+
+            User.findOne({
+                    email: body.email
+             })
+                .then(function(user) {
+
+                    if(user && user !== null && user.validatePassword(body.password)) {
+
+                        return res.status(status.OK)
+                                  .json({"user": user.toPublicJSON(), "token": user.getToken()});
+                    };
+                        return res.status(status.UNAUTHORIZED)
+                                  .json({"error": "Wrong email or password."});
+                })
+                .catch(function(err) {
+                        return res.status(status.UNAUTHORIZED)
+                                  .json({"error": "Wrong email or password."});
+                });
 
         },
         register: function (req, res) {

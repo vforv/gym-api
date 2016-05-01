@@ -1,8 +1,9 @@
 var _ = require('underscore');
 var mongoose = require('mongoose');
+var config = require('config');
 
-module.exports = function (wagner, config) {
-    mongoose.connect(config.db);
+module.exports = function (wagner) {
+    mongoose.connect(config.get('db'));
     
     var user = mongoose.model('User',require("./user"));
     

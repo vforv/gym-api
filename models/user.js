@@ -1,6 +1,9 @@
 var mongoose = require('mongoose');
 var crypto = require('crypto');
 var _ = require('underscore');
+var config = require('config');
+var jwt = require('jsonwebtoken');
+var cryptoJs = require('crypto-js');
 
 var userSchema = {
     name: {type: String, required: false},
@@ -21,7 +24,9 @@ var schema = new mongoose.Schema(userSchema);
 
 schema.pre('save', function (next) {
     var _this = this;
+
     _this.updateDate = Date.now;
+    _this.email = _this.email.toLowerCase();
     next();
 });
 
@@ -29,9 +34,9 @@ schema.pre('save', function (next) {
 schema.virtual('hash').set(function (password) {
     var _this = this;
 
-    _this.salt = new Buffer(32).toString('base64');
+    _this.salt = new Buffer(config.get('bcrypt.bytes')).toString('base64');
 
-    var hash = crypto.pbkdf2Sync(password, _this.salt, 1000, 32).toString('hex');
+    var hash = crypto.pbkdf2Sync(password, _this.salt, config.get('bcrypt.iterations'), config.get('bcrypt.bytes')).toString('hex');
     _this.password = hash;
 });
 
@@ -44,9 +49,51 @@ schema.methods.toPublicJSON = function () {
 schema.methods.validatePassword = function (password) {
     var _this = this;
 
-    var hash = crypto.pbkdf2Sync(password, _this.salt, app.config.bcrypt.iterations, app.config.bcrypt.bytes).toString('hex');
+    var hash = crypto.pbkdf2Sync(password, _this.salt, config.get('bcrypt.iterations'), config.get('bcrypt.bytes')).toString('hex');
     return _this.password === hash;
 };
 
+schema.methods.getToken = function() {
+    var _this = this;
+
+    try {
+                    var stringData = JSON.stringify({id: _this._id, type: config.get('jwt.type')});
+
+                    var encryptedData = cryptoJs.AES.encrypt(stringData, config.get('jwt.key')).toString();
+
+                    var token = jwt.sign({
+                        token: encryptedData
+                    }, config.get('jwt.secret'));
+
+                    return token;
+                } catch (e) {
+                    return {"error" : "Can not generate token."};
+                }
+}
+
+schema.statics.findByToken = function(token) {
+    return new Promise(function (resolve, reject) {
+        try {
+                        var decodedJWT = jwt.verify(token, config.get('jwt.secret'));
+                        var bytes = cryptoJs.AES.decrypt(decodedJWT.token, config.get('jwt.key'));
+                        var tokenData = JSON.parse(bytes.toString(cryptoJs.enc.Utf8));
+                        
+                        mongoose.model('User').findById(tokenData.id)
+                                .then(function (user) {
+
+                                    if (user) {
+                                        resolve(user);
+                                    } else {
+                                        reject();
+                                    }
+                                })
+                                .catch(function () {
+                                    reject();
+                                });
+                    } catch (e) {
+                        reject();
+                    }
+                });
+}
 
 module.exports = schema;

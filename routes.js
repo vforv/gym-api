@@ -3,6 +3,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 
 
+
 /**
  * 
  * Routes /api/v*
@@ -12,21 +13,33 @@ var bodyParser = require('body-parser');
  */
 module.exports = function (wagner) 
 {
-    
-    var api = express.Router();
-    api.use(bodyParser.json());
-    
-    //User routes
+    var UserModal = wagner.invoke(function(User) {
+        return User;
+    });
+    var auth = require('./middlewares/auth')(UserModal);
+    var route = express.Router();
+    route.use(bodyParser.json());
 
-    api.post('/register', wagner.invoke(function(User){
+    
+
+    
+    
+    
+    //GUEST USERS
+    route.post('/register', wagner.invoke(function(User){
     	return logic(User).register;
     }));
 
-    api.post('/login', wagner.invoke(function(User) {
+    route.post('/login', wagner.invoke(function(User) {
         return logic(User).login;
     }));
 
+    //AUTHENTICATED USERS
+    route.use(auth.authenticated);
     
+    route.get('/test', function(req,res) {
+        res.send("HELLOW");
+    });
     
-    return api;
+    return route;
 }
