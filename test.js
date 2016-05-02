@@ -47,7 +47,8 @@ describe('Test User', function () {
                 .send({
                     name: 'Vladimir',
                     email: 'vladimir@gmail.com',
-                    password: 'test123'
+                    password: 'test123',
+                    role: ['admin', 'user']
                 })
                 .end(function (err, res) {
                     assert.ifError(err);

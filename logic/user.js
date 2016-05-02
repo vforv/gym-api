@@ -28,12 +28,13 @@ function userWrapper(User) {
 
         },
         register: function (req, res) {
-            var body = _.pick(req.body, 'name', 'email', 'password');
+            var body = _.pick(req.body, 'name', 'email', 'password', 'role');
 
             User.create({
                 name: body.name,
                 email: body.email,
-                hash: body.password
+                hash: body.password,
+                roles: body.role
             })
                     .then(function (user) {
                         return res.send(user.toPublicJSON());

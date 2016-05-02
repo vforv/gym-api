@@ -16,7 +16,9 @@ module.exports = function (wagner)
     var UserModal = wagner.invoke(function(User) {
         return User;
     });
+    
     var auth = require('./middlewares/auth')(UserModal);
+    var roles = require('./middlewares/roles')(UserModal);
     var route = express.Router();
     route.use(bodyParser.json());
 
@@ -37,8 +39,12 @@ module.exports = function (wagner)
     //AUTHENTICATED USERS
     route.use(auth.authenticated);
     
-    route.get('/test', function(req,res) {
+    route.get('/test',roles.admin ,function(req,res) {
         res.send("HELLOW");
+    });
+    
+    route.get('/profile',function(req,res) {
+        res.json(req.user);
     });
     
     return route;

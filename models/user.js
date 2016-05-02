@@ -6,11 +6,11 @@ var jwt = require('jsonwebtoken');
 var cryptoJs = require('crypto-js');
 
 var userSchema = {
-    name: {type: String, required: false},
+    name: {type: String, required: true},
     picture: {type: String, required: false},
     email: {type: String, required: true, index: {unique: true}},
-    password: {type: String, required: false},
-    salt: {type: String, required: false},
+    password: {type: String, required: true},
+    salt: {type: String, required: true},
     createDate: {type: Date, default: Date.now},
     updateDate: {type: Date, default: Date.now},
     activationCode: {type: String, required: false},
@@ -18,6 +18,13 @@ var userSchema = {
     status: {type: String},
     deletedDate: {type: Date},
     isDeleted: {type: Boolean, default: false},
+    roles: {
+        type: [{
+            type: String,
+            enum: ['user', 'admin']
+        }],
+        default: ['user']
+    }
 }
 
 var schema = new mongoose.Schema(userSchema);
@@ -43,7 +50,7 @@ schema.virtual('hash').set(function (password) {
 schema.methods.toPublicJSON = function () {
     var json = this.toJSON();
 
-    return _.pick(json, 'name', 'email', '_id', 'updateDate', 'createDate', 'picture');
+    return _.pick(json, 'name', 'email', '_id', 'updateDate', 'createDate', 'picture', 'roles');
 };
 
 schema.methods.validatePassword = function (password) {

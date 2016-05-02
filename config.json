@@ -1,9 +1,0 @@
-{
-    "db": "mongodb://localhost:27017/gym-db",
-    "version": "/api/v1",
-    "bcrypt":{
-        "saltWorkFactor":10,
-        "iterations":1000,
-        "bytes":32
-    }
-}
