@@ -20,9 +20,9 @@ var userSchema = {
     isDeleted: {type: Boolean, default: false},
     roles: {
         type: [{
-            type: String,
-            enum: ['user', 'admin']
-        }],
+                type: String,
+                enum: ['user', 'admin']
+            }],
         default: ['user']
     }
 }
@@ -60,47 +60,47 @@ schema.methods.validatePassword = function (password) {
     return _this.password === hash;
 };
 
-schema.methods.getToken = function() {
+schema.methods.getToken = function () {
     var _this = this;
 
     try {
-                    var stringData = JSON.stringify({id: _this._id, type: config.get('jwt.type')});
+        var stringData = JSON.stringify({id: _this._id, type: config.get('jwt.type')});
 
-                    var encryptedData = cryptoJs.AES.encrypt(stringData, config.get('jwt.key')).toString();
+        var encryptedData = cryptoJs.AES.encrypt(stringData, config.get('jwt.key')).toString();
 
-                    var token = jwt.sign({
-                        token: encryptedData
-                    }, config.get('jwt.secret'));
+        var token = jwt.sign({
+            token: encryptedData
+        }, config.get('jwt.secret'));
 
-                    return token;
-                } catch (e) {
-                    return {"error" : "Can not generate token."};
-                }
+        return token;
+    } catch (e) {
+        return {"error": "Can not generate token."};
+    }
 }
 
-schema.statics.findByToken = function(token) {
+schema.statics.findByToken = function (token) {
     return new Promise(function (resolve, reject) {
         try {
-                        var decodedJWT = jwt.verify(token, config.get('jwt.secret'));
-                        var bytes = cryptoJs.AES.decrypt(decodedJWT.token, config.get('jwt.key'));
-                        var tokenData = JSON.parse(bytes.toString(cryptoJs.enc.Utf8));
-                        
-                        mongoose.model('User').findById(tokenData.id)
-                                .then(function (user) {
+            var decodedJWT = jwt.verify(token, config.get('jwt.secret'));
+            var bytes = cryptoJs.AES.decrypt(decodedJWT.token, config.get('jwt.key'));
+            var tokenData = JSON.parse(bytes.toString(cryptoJs.enc.Utf8));
 
-                                    if (user) {
-                                        resolve(user);
-                                    } else {
-                                        reject();
-                                    }
-                                })
-                                .catch(function () {
-                                    reject();
-                                });
-                    } catch (e) {
+            mongoose.model('User').findById(tokenData.id)
+                    .then(function (user) {
+
+                        if (user) {
+                            resolve(user);
+                        } else {
+                            reject();
+                        }
+                    })
+                    .catch(function () {
                         reject();
-                    }
-                });
+                    });
+        } catch (e) {
+            reject();
+        }
+    });
 }
 
 module.exports = schema;

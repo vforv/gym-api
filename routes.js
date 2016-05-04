@@ -40,7 +40,7 @@ module.exports = function (wagner)
     route.use(auth.authenticated);
     
     route.get('/test',roles.admin ,function(req,res) {
-        res.send("HELLOW");
+        res.send("Hello World");
     });
     
     route.get('/profile',function(req,res) {
