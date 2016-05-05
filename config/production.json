@@ -1,5 +1,5 @@
 {
-    "db": "mongodb://localhost:27017/gym-db",
+    "db": "mongodb://<gym>:<test123>@ds017678.mlab.com:17678/gym-api",
     "version": "/api/v1",
     "bcrypt":{
         "saltWorkFactor":10,
