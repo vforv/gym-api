@@ -1,5 +1,5 @@
-_ = require('underscore');
-status = require('http-status');
+var _ = require('underscore');
+var status = require('http-status');
 var module;
 
 function userWrapper(User) {
@@ -29,7 +29,9 @@ function userWrapper(User) {
         },
         register: function (req, res) {
             var body = _.pick(req.body, 'name', 'email', 'password', 'role');
-
+            return res
+                                .status(status.INTERNAL_SERVER_ERROR)
+                                .json({"error": "Internal server error."});
             User.create({
                 name: body.name,
                 email: body.email,
