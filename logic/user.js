@@ -9,29 +9,28 @@ function userWrapper(User) {
             var body = _.pick(req.body, 'email', 'password');
 
             User.findOne({
-                    email: body.email
-             })
-                .then(function(user) {
+                email: body.email
+            })
+                    .then(function (user) {
 
-                    if(user && user !== null && user.validatePassword(body.password)) {
+                        if (user && user !== null && user.validatePassword(body.password)) {
 
-                        return res.status(status.OK)
-                                  .json({"user": user.toPublicJSON(), "token": user.getToken()});
-                    };
+                            return res.status(status.OK)
+                                    .json({"user": user.toPublicJSON(), "token": user.getToken()});
+                        }
+                        ;
                         return res.status(status.UNAUTHORIZED)
-                                  .json({"error": "Wrong email or password."});
-                })
-                .catch(function(err) {
+                                .json({"error": "Wrong email or password."});
+                    })
+                    .catch(function (err) {
                         return res.status(status.UNAUTHORIZED)
-                                  .json({"error": "Wrong email or password."});
-                });
+                                .json({"error": "Wrong email or password."});
+                    });
 
         },
         register: function (req, res) {
             var body = _.pick(req.body, 'name', 'email', 'password', 'role');
-            return res
-                                .status(status.INTERNAL_SERVER_ERROR)
-                                .json({"error": "Internal server error."});
+
             User.create({
                 name: body.name,
                 email: body.email,
@@ -39,7 +38,8 @@ function userWrapper(User) {
                 roles: body.role
             })
                     .then(function (user) {
-                        return res.send(user.toPublicJSON());
+                        return res.status(status.OK)
+                                .json(user.toPublicJSON());
                     }, function (err) {
                         if (err.code === 11000) {
                             return res
@@ -51,11 +51,16 @@ function userWrapper(User) {
                                 .status(status.INTERNAL_SERVER_ERROR)
                                 .json({"error": "Internal server error."});
 
-                    });
+                    })
+                    .catch(function (err) {
+                        return res.status(status.UNAUTHORIZED)
+                                .json({"error": "Wrong email or password."});
+                    });;
         }
     };
 
     return user;
-};
+}
+;
 
 module.exports = userWrapper;
