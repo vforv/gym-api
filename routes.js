@@ -28,7 +28,7 @@ module.exports = function (wagner)
     
     
     //GUEST USERS
-    route.get('/',roles.admin ,function(req,res) {
+    route.get('/' ,function(req,res) {
         res.send("Hello World");
     });
     
