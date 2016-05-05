@@ -1,4 +1,3 @@
-var logic = require('./logic/user');
 var express = require('express');
 var bodyParser = require('body-parser');
 
@@ -32,14 +31,33 @@ module.exports = function (wagner)
         res.send("Hello World");
     });
     
+    var userLogic = require('./logic/user');
+    var gymLogic = require('./logic/gym');
+    
     route.post('/register', wagner.invoke(function(User){
-    	return logic(User).register;
+    	return userLogic(User).register;
     }));
 
     route.post('/login', wagner.invoke(function(User) {
-        return logic(User).login;
+        return userLogic(User).login;
     }));
-
+    
+    route.get('/gyms', wagner.invoke(function(Gym){
+        return gymLogic(Gym).index;
+    }));
+    
+    route.get('/gym/search', wagner.invoke(function(Gym){
+        return gymLogic(Gym).show;
+    }));
+    
+    route.post('/gyms/add', wagner.invoke(function(Gym){
+        return gymLogic(Gym).store;
+    }));
+    
+    route.post('/gym/claim', wagner.invoke(function(Gym) {
+        return gymLogic(Gym).put;
+    }));
+    
     //AUTHENTICATED USERS
     route.use(auth.authenticated);
     
@@ -52,4 +70,4 @@ module.exports = function (wagner)
     });
     
     return route;
-}
+};
